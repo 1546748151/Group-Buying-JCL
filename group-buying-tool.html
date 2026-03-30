@@ -1636,10 +1636,18 @@
             const deadline = Storage.get('deadline') || { enabled: false };
             const shopName = Storage.get('shopName') || '小区团购';
             
+            // 简化商品数据（不包含图片，避免URL过长）
+            const simplifiedProducts = products.map(p => ({
+                id: p.id,
+                name: p.name,
+                specs: p.specs
+                // 注意：不包含 image 字段，因为base64图片会让URL太长
+            }));
+            
             // 构建数据对象
             const shopData = {
                 name: shopName,
-                products: products,
+                products: simplifiedProducts,
                 deadline: deadline
             };
             
@@ -1651,16 +1659,22 @@
             const baseUrl = window.location.href.split('?')[0];
             const shopUrl = baseUrl + '?data=' + encodedData;
             
-            new QRCode(qrcodeDiv, {
-                text: shopUrl,
-                width: 180,
-                height: 180,
-                colorDark: '#000000',
-                colorLight: '#ffffff',
-                correctLevel: QRCode.CorrectLevel.M
-            });
+            console.log('二维码URL长度:', shopUrl.length); // 调试用
             
-            modal.classList.add('active');
+            try {
+                new QRCode(qrcodeDiv, {
+                    text: shopUrl,
+                    width: 180,
+                    height: 180,
+                    colorDark: '#000000',
+                    colorLight: '#ffffff',
+                    correctLevel: QRCode.CorrectLevel.M
+                });
+                modal.classList.add('active');
+            } catch (e) {
+                console.error('二维码生成失败:', e);
+                showToast('商品太多，请减少商品数量或删除图片后重试');
+            }
         }
         
         function closeQRModal() {
@@ -1691,11 +1705,15 @@
             if (encodedData) {
                 // 从二维码数据解码
                 try {
+                    console.log('解码数据长度:', encodedData.length);
                     const decodedStr = decodeURIComponent(atob(encodedData));
+                    console.log('解码后字符串长度:', decodedStr.length);
                     const shopData = JSON.parse(decodedStr);
                     products = shopData.products || [];
                     shopName = shopData.name || '小区团购';
                     urlDeadline = shopData.deadline;
+                    
+                    console.log('成功解码，商品数量:', products.length);
                     
                     // 将团长数据保存到邻居的本地存储
                     Storage.set('products', products);
@@ -1706,6 +1724,9 @@
                 } catch (e) {
                     console.error('解码失败', e);
                     showToast('二维码数据有误，请重新生成');
+                    // 解码失败时使用本地存储的数据（如果有）
+                    products = Storage.get('products') || [];
+                    shopName = Storage.get('shopName') || '小区团购';
                 }
             } else {
                 // 兼容旧方式：从本地存储读取（团长自己测试）
