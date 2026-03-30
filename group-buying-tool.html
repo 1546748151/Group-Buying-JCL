@@ -13,10 +13,30 @@
             box-sizing: border-box;
         }
         
+        :root {
+            --primary: #07c160;
+            --primary-dark: #06ad56;
+            --primary-light: #e6f7ed;
+            --danger: #ff4d4f;
+            --warning: #faad14;
+            --text-primary: #1f1f1f;
+            --text-secondary: #666666;
+            --text-tertiary: #999999;
+            --bg-gray: #f5f5f5;
+            --border-color: #e8e8e8;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+            --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+        }
+        
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
-            background: #f5f5f5;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
             min-height: 100vh;
+            color: var(--text-primary);
         }
         
         .container {
@@ -32,96 +52,142 @@
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            padding: 20px;
+            padding: 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
         
         .login-page h1 {
-            color: #07c160;
-            margin-bottom: 10px;
-            font-size: 24px;
+            color: white;
+            margin-bottom: 8px;
+            font-size: 32px;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         
         .login-page .subtitle {
-            color: #999;
+            color: rgba(255,255,255,0.85);
             margin-bottom: 40px;
-            font-size: 14px;
+            font-size: 15px;
+            letter-spacing: 1px;
         }
         
         .login-box {
             background: white;
-            border-radius: 12px;
-            padding: 30px;
+            border-radius: var(--radius-lg);
+            padding: 40px 32px;
             width: 100%;
-            max-width: 320px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            max-width: 360px;
+            box-shadow: var(--shadow-lg);
         }
         
         .login-input {
             width: 100%;
-            padding: 12px 15px;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
+            padding: 14px 18px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-md);
             font-size: 16px;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             outline: none;
+            transition: all 0.3s ease;
+            background: #fafafa;
         }
         
         .login-input:focus {
-            border-color: #07c160;
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 4px var(--primary-light);
+        }
+        
+        .login-input::placeholder {
+            color: var(--text-tertiary);
         }
         
         .btn {
             width: 100%;
-            padding: 14px;
+            padding: 14px 24px;
             border: none;
-            border-radius: 8px;
+            border-radius: var(--radius-md);
             font-size: 16px;
+            font-weight: 500;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn:active {
+            transform: scale(0.98);
         }
         
         .btn-primary {
-            background: #07c160;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
+            box-shadow: 0 4px 12px rgba(7, 193, 96, 0.3);
         }
         
         .btn-primary:hover {
-            background: #06ad56;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, #059144 100%);
+            box-shadow: 0 6px 16px rgba(7, 193, 96, 0.4);
         }
         
         .btn-secondary {
-            background: #f5f5f5;
-            color: #333;
-            margin-top: 10px;
+            background: white;
+            color: var(--text-primary);
+            border: 2px solid var(--border-color);
+            margin-top: 12px;
+        }
+        
+        .btn-secondary:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--primary-light);
         }
         
         .btn-danger {
-            background: #ff4d4f;
+            background: linear-gradient(135deg, var(--danger) 0%, #d9363e 100%);
             color: white;
+            box-shadow: 0 4px 12px rgba(255, 77, 79, 0.3);
+        }
+        
+        .btn-danger:hover {
+            background: linear-gradient(135deg, #d9363e 0%, #b91d23 100%);
         }
         
         .btn-small {
             padding: 8px 16px;
-            font-size: 14px;
+            font-size: 13px;
             width: auto;
+            border-radius: var(--radius-sm);
         }
         
         /* 头部导航 */
         .header {
             background: white;
-            padding: 15px;
+            padding: 16px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid var(--border-color);
             position: sticky;
             top: 0;
             z-index: 100;
+            box-shadow: var(--shadow-sm);
         }
         
         .header h1 {
-            font-size: 18px;
-            color: #333;
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .header h1::before {
+            content: '🏪';
+            font-size: 24px;
         }
         
         .header-right {
@@ -133,80 +199,111 @@
         .tab-nav {
             display: flex;
             background: white;
-            border-bottom: 1px solid #eee;
-            margin-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 20px;
+            padding: 0 10px;
         }
         
         .tab-item {
             flex: 1;
             text-align: center;
-            padding: 15px;
+            padding: 16px 12px;
             cursor: pointer;
-            color: #666;
+            color: var(--text-secondary);
             font-size: 14px;
+            font-weight: 500;
             position: relative;
+            transition: all 0.3s ease;
+            border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+        }
+        
+        .tab-item:hover {
+            color: var(--primary);
+            background: rgba(7, 193, 96, 0.04);
         }
         
         .tab-item.active {
-            color: #07c160;
-            font-weight: 500;
+            color: var(--primary);
+            font-weight: 600;
         }
         
         .tab-item.active::after {
             content: '';
             position: absolute;
             bottom: 0;
-            left: 20%;
-            right: 20%;
-            height: 2px;
-            background: #07c160;
+            left: 15%;
+            right: 15%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            border-radius: 3px 3px 0 0;
         }
         
         /* 卡片样式 */
         .card {
             background: white;
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 15px;
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            box-shadow: var(--shadow-md);
         }
         
         .card-title {
-            font-size: 16px;
-            font-weight: 500;
-            margin-bottom: 15px;
-            color: #333;
+            font-size: 17px;
+            font-weight: 600;
+            margin-bottom: 18px;
+            color: var(--text-primary);
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
         
+        .card-title::before {
+            content: '';
+            width: 4px;
+            height: 18px;
+            background: linear-gradient(180deg, var(--primary), var(--primary-dark));
+            border-radius: 2px;
+            margin-right: 10px;
+        }
+        
         /* 表单样式 */
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
         
         .form-label {
             display: block;
-            margin-bottom: 8px;
-            color: #666;
+            margin-bottom: 10px;
+            color: var(--text-secondary);
             font-size: 14px;
+            font-weight: 500;
         }
         
         .form-input, .form-select, .form-textarea {
             width: 100%;
-            padding: 12px;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 14px;
+            padding: 14px 16px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-size: 15px;
             outline: none;
+            transition: all 0.3s ease;
+            background: #fafafa;
         }
         
         .form-input:focus, .form-select:focus, .form-textarea:focus {
-            border-color: #07c160;
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 4px var(--primary-light);
         }
         
         .form-textarea {
-            min-height: 80px;
+            min-height: 100px;
             resize: vertical;
         }
         
@@ -217,67 +314,85 @@
         /* 商品列表 */
         .product-item {
             display: flex;
-            gap: 12px;
-            padding: 15px 0;
-            border-bottom: 1px solid #f0f0f0;
+            gap: 16px;
+            padding: 18px 0;
+            border-bottom: 1px solid var(--border-color);
+            transition: all 0.3s ease;
         }
         
         .product-item:last-child {
             border-bottom: none;
         }
         
+        .product-item:hover {
+            background: rgba(7, 193, 96, 0.02);
+        }
+        
         .product-img {
-            width: 80px;
-            height: 80px;
-            border-radius: 8px;
+            width: 90px;
+            height: 90px;
+            border-radius: var(--radius-md);
             object-fit: cover;
-            background: #f5f5f5;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
+            box-shadow: var(--shadow-sm);
         }
         
         .product-img-placeholder {
-            width: 80px;
-            height: 80px;
-            border-radius: 8px;
-            background: #f0f0f0;
+            width: 90px;
+            height: 90px;
+            border-radius: var(--radius-md);
+            background: linear-gradient(135deg, #f0f4f8 0%, #e1e8ed 100%);
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #ccc;
-            font-size: 12px;
+            color: var(--text-tertiary);
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: var(--shadow-sm);
         }
         
         .product-info {
             flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
         
         .product-name {
-            font-size: 15px;
-            font-weight: 500;
-            color: #333;
-            margin-bottom: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            line-height: 1.4;
         }
         
         .product-spec {
             font-size: 13px;
-            color: #999;
-            margin-bottom: 5px;
+            color: var(--text-tertiary);
+            margin-bottom: 8px;
+            background: var(--bg-gray);
+            padding: 4px 10px;
+            border-radius: 20px;
+            display: inline-block;
+            width: fit-content;
         }
         
         .product-price {
-            font-size: 16px;
-            color: #ff4d4f;
-            font-weight: 500;
+            font-size: 18px;
+            color: var(--danger);
+            font-weight: 700;
         }
         
         .product-stock {
             font-size: 12px;
-            color: #999;
+            color: var(--text-tertiary);
+            margin-top: 4px;
         }
         
         .product-actions {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 10px;
             justify-content: center;
         }
         
@@ -285,149 +400,230 @@
         .quantity-selector {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
+            background: var(--bg-gray);
+            padding: 6px;
+            border-radius: 25px;
+            width: fit-content;
         }
         
         .qty-btn {
-            width: 28px;
-            height: 28px;
-            border: 1px solid #e0e0e0;
+            width: 32px;
+            height: 32px;
+            border: none;
             background: white;
-            border-radius: 4px;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            font-size: 16px;
-            color: #666;
+            font-size: 18px;
+            color: var(--primary);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.2s ease;
+        }
+        
+        .qty-btn:hover {
+            background: var(--primary);
+            color: white;
+            transform: scale(1.1);
         }
         
         .qty-btn:active {
-            background: #f5f5f5;
+            transform: scale(0.95);
         }
         
         .qty-value {
-            min-width: 30px;
+            min-width: 36px;
             text-align: center;
-            font-size: 15px;
-            font-weight: 500;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
         }
         
         /* 规格选择 */
+        .spec-group {
+            margin-top: 10px;
+        }
+        
+        .spec-group-label {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
         .spec-options {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
+            gap: 10px;
             margin-top: 8px;
         }
         
         .spec-option {
-            padding: 6px 12px;
-            border: 1px solid #e0e0e0;
-            border-radius: 4px;
+            padding: 8px 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 20px;
             font-size: 13px;
             cursor: pointer;
             background: white;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .spec-option:hover {
+            border-color: var(--primary);
+            color: var(--primary);
         }
         
         .spec-option.selected {
-            border-color: #07c160;
-            background: #e6f7ed;
-            color: #07c160;
+            border-color: var(--primary);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            box-shadow: 0 2px 8px rgba(7, 193, 96, 0.3);
         }
         
         .spec-option:disabled {
             opacity: 0.5;
             cursor: not-allowed;
+            background: var(--bg-gray);
         }
         
         /* 订单列表 */
         .order-item {
-            padding: 15px;
-            border-bottom: 1px solid #f0f0f0;
+            padding: 18px;
+            border-bottom: 1px solid var(--border-color);
             background: white;
+            border-radius: var(--radius-md);
+            margin-bottom: 12px;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+        }
+        
+        .order-item:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+        
+        .order-item:last-child {
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 0;
         }
         
         .order-header {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
+            align-items: center;
         }
         
         .order-user {
-            font-weight: 500;
-            color: #333;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .order-user::before {
+            content: '👤';
         }
         
         .order-time {
             font-size: 12px;
-            color: #999;
+            color: var(--text-tertiary);
         }
         
         .order-total {
-            font-size: 16px;
-            color: #ff4d4f;
-            font-weight: 500;
+            font-size: 18px;
+            color: var(--danger);
+            font-weight: 700;
         }
         
         .order-products {
-            margin: 10px 0;
-            padding-left: 15px;
+            margin: 12px 0;
+            padding: 12px;
+            background: var(--bg-gray);
+            border-radius: var(--radius-sm);
         }
         
         .order-product {
             font-size: 14px;
-            color: #666;
-            margin-bottom: 4px;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+            padding: 4px 0;
+        }
+        
+        .order-product:last-child {
+            margin-bottom: 0;
         }
         
         .order-note {
             font-size: 13px;
-            color: #999;
-            margin-top: 8px;
-            padding: 8px;
-            background: #f9f9f9;
-            border-radius: 4px;
+            color: var(--warning);
+            margin-top: 10px;
+            padding: 10px 12px;
+            background: #fff7e6;
+            border: 1px solid #ffd591;
+            border-radius: var(--radius-sm);
+            border-left: 3px solid var(--warning);
         }
         
         /* 汇总卡片 */
         .summary-card {
-            background: linear-gradient(135deg, #07c160 0%, #06ad56 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 15px;
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-md);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .summary-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
         }
         
         .summary-title {
             font-size: 14px;
             opacity: 0.9;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
+            font-weight: 500;
         }
         
         .summary-value {
-            font-size: 28px;
-            font-weight: 600;
+            font-size: 32px;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         
         /* 二维码区域 */
         .qr-section {
             text-align: center;
-            padding: 20px;
+            padding: 24px;
         }
         
         #qrcode {
             display: inline-block;
-            padding: 15px;
+            padding: 20px;
             background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
         }
         
         .qr-tip {
-            margin-top: 15px;
-            color: #666;
+            margin-top: 20px;
+            color: var(--text-secondary);
             font-size: 14px;
+            line-height: 1.6;
         }
         
         /* 收款汇总 */
@@ -435,8 +631,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid #f0f0f0;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--border-color);
         }
         
         .payment-item:last-child {
@@ -446,25 +642,27 @@
         .payment-user {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
         }
         
         .user-avatar {
-            width: 36px;
-            height: 36px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
-            background: #07c160;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 14px;
+            font-size: 16px;
+            font-weight: 600;
+            box-shadow: var(--shadow-sm);
         }
         
         .payment-amount {
-            font-size: 16px;
-            color: #ff4d4f;
-            font-weight: 500;
+            font-size: 18px;
+            color: var(--danger);
+            font-weight: 700;
         }
         
         /* 底部结算栏 */
@@ -474,51 +672,65 @@
             left: 0;
             right: 0;
             background: white;
-            border-top: 1px solid #eee;
-            padding: 10px 15px;
+            border-top: 1px solid var(--border-color);
+            padding: 16px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             max-width: 600px;
             margin: 0 auto;
+            box-shadow: 0 -4px 16px rgba(0,0,0,0.08);
+            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
         }
         
         .cart-total {
-            font-size: 18px;
-            color: #ff4d4f;
-            font-weight: 600;
+            font-size: 24px;
+            color: var(--danger);
+            font-weight: 700;
         }
         
         .cart-count {
             font-size: 13px;
-            color: #666;
-            margin-top: 2px;
+            color: var(--text-secondary);
+            margin-top: 4px;
         }
         
         .btn-submit {
-            background: #07c160;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
-            padding: 12px 30px;
-            border-radius: 20px;
+            padding: 14px 36px;
+            border-radius: 25px;
             border: none;
-            font-size: 15px;
+            font-size: 16px;
+            font-weight: 600;
             cursor: pointer;
+            box-shadow: 0 4px 12px rgba(7, 193, 96, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-submit:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(7, 193, 96, 0.4);
         }
         
         .btn-submit:disabled {
-            background: #ccc;
+            background: var(--border-color);
+            color: var(--text-tertiary);
+            box-shadow: none;
+            cursor: not-allowed;
         }
         
         /* 空状态 */
         .empty-state {
             text-align: center;
-            padding: 50px 20px;
-            color: #999;
+            padding: 50px 24px;
+            color: var(--text-tertiary);
         }
         
         .empty-icon {
-            font-size: 48px;
-            margin-bottom: 15px;
+            font-size: 56px;
+            margin-bottom: 20px;
+            opacity: 0.7;
         }
         
         /* 弹窗 */
@@ -529,69 +741,119 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.6);
             z-index: 1000;
             align-items: center;
             justify-content: center;
             padding: 20px;
+            backdrop-filter: blur(4px);
         }
         
         .modal.active {
             display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
         
         .modal-content {
             background: white;
-            border-radius: 12px;
-            width: 100%;
-            max-width: 400px;
-            max-height: 90vh;
+            border-radius: var(--radius-lg);
+            width: 92%;
+            max-width: 520px;
+            max-height: 85vh;
             overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+            animation: slideUp 0.3s ease;
+            margin: 20px auto;
+        }
+        
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
         
         .modal-header {
-            padding: 15px;
-            border-bottom: 1px solid #eee;
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border-color);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
         }
         
         .modal-title {
-            font-size: 16px;
-            font-weight: 500;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
         }
         
         .modal-close {
-            font-size: 24px;
-            color: #999;
+            font-size: 28px;
+            color: var(--text-tertiary);
             cursor: pointer;
+            transition: all 0.2s ease;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        
+        .modal-close:hover {
+            color: var(--danger);
+            background: rgba(255, 77, 79, 0.1);
         }
         
         .modal-body {
-            padding: 15px;
+            padding: 28px;
         }
         
         .modal-footer {
-            padding: 15px;
-            border-top: 1px solid #eee;
+            padding: 24px 28px;
+            border-top: 1px solid var(--border-color);
             display: flex;
-            gap: 10px;
+            gap: 16px;
+            background: #fafafa;
+        }
+        
+        .modal-footer .btn {
+            flex: 1;
+            padding: 16px;
+            font-size: 16px;
         }
         
         /* 图片上传 */
         .image-upload {
-            width: 100px;
-            height: 100px;
-            border: 2px dashed #e0e0e0;
-            border-radius: 8px;
+            width: 120px;
+            height: 120px;
+            border: 2px dashed #d0d0d0;
+            border-radius: 12px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             color: #999;
-            font-size: 12px;
+            font-size: 13px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        
+        .image-upload:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--primary-light);
         }
         
         .image-upload.has-image {
@@ -625,20 +887,30 @@
         /* 规格编辑器 */
         .spec-editor {
             background: #f9f9f9;
-            border-radius: 8px;
-            padding: 12px;
-            margin-bottom: 10px;
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 12px;
         }
         
         .spec-row {
             display: flex;
-            gap: 10px;
-            margin-bottom: 10px;
+            gap: 12px;
+            margin-bottom: 12px;
             align-items: center;
+        }
+        
+        .spec-row:last-child {
+            margin-bottom: 0;
         }
         
         .spec-row input {
             flex: 1;
+            padding: 12px;
+            font-size: 14px;
+        }
+        
+        .spec-row .form-input-small {
+            flex: 0 0 100px;
         }
         
         /* 截止时间设置 */
@@ -780,17 +1052,322 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.8);
+            background: rgba(0,0,0,0.85);
             color: white;
-            padding: 12px 24px;
-            border-radius: 6px;
-            font-size: 14px;
+            padding: 16px 32px;
+            border-radius: 50px;
+            font-size: 15px;
+            font-weight: 500;
             z-index: 2000;
             display: none;
+            box-shadow: var(--shadow-lg);
+            backdrop-filter: blur(10px);
+            max-width: 80%;
+            text-align: center;
         }
         
         .toast.show {
             display: block;
+            animation: toastIn 0.3s ease;
+        }
+        
+        @keyframes toastIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+        
+        /* 图片上传 */
+        .image-upload {
+            width: 120px;
+            height: 120px;
+            border: 2px dashed var(--border-color);
+            border-radius: var(--radius-md);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--text-tertiary);
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        
+        .image-upload:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+        
+        .image-upload.has-image {
+            border: none;
+            position: relative;
+        }
+        
+        .image-upload.has-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: var(--radius-md);
+        }
+        
+        .image-upload .remove-img {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            width: 24px;
+            height: 24px;
+            background: var(--danger);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            cursor: pointer;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        /* 规格编辑器 */
+        .spec-editor {
+            background: var(--bg-gray);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+        
+        .spec-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+            align-items: center;
+        }
+        
+        .spec-row:last-child {
+            margin-bottom: 0;
+        }
+        
+        /* 截止时间设置 */
+        .deadline-section {
+            background: #fff7e6;
+            border: 2px solid #ffd591;
+            border-radius: var(--radius-md);
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .deadline-section.active {
+            background: var(--primary-light);
+            border-color: var(--primary);
+        }
+        
+        /* 订单截止提示 */
+        .closed-notice {
+            text-align: center;
+            padding: 60px 24px;
+        }
+        
+        .closed-notice h2 {
+            color: var(--danger);
+            margin-bottom: 16px;
+            font-size: 22px;
+        }
+        
+        .closed-notice p {
+            color: var(--text-secondary);
+            font-size: 15px;
+            line-height: 1.6;
+        }
+        
+        /* 开关样式 */
+        .switch {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+        }
+        
+        .switch-input {
+            width: 52px;
+            height: 30px;
+            background: #ccc;
+            border-radius: 15px;
+            position: relative;
+            transition: background 0.3s;
+        }
+        
+        .switch-input::after {
+            content: '';
+            position: absolute;
+            width: 26px;
+            height: 26px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .switch-input.active {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        }
+        
+        .switch-input.active::after {
+            left: 24px;
+        }
+        
+        /* 用户下单页头部 */
+        .shop-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 28px 24px;
+            border-radius: var(--radius-lg);
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .shop-name {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .shop-notice {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .deadline-timer {
+            background: rgba(255,255,255,0.2);
+            padding: 10px 16px;
+            border-radius: 20px;
+            margin-top: 16px;
+            font-size: 14px;
+            display: inline-block;
+            backdrop-filter: blur(10px);
+        }
+        
+        /* 复制按钮 */
+        .copy-btn {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            box-shadow: 0 2px 8px rgba(7, 193, 96, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .copy-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(7, 193, 96, 0.4);
+        }
+        
+        /* 隐藏的元素 */
+        .hidden {
+            display: none !important;
+        }
+        
+        /* 页面内容区域 */
+        .page-content {
+            padding-bottom: 100px;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* 页面切换动画 */
+        .tab-content {
+            animation: fadeInUp 0.4s ease;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* 商品项进入动画 */
+        .product-item {
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        /* 按钮点击波纹效果 */
+        .btn {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255,255,255,0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        
+        .btn:active::after {
+            width: 300px;
+            height: 300px;
+        }
+        
+        /* 卡片悬浮效果 */
+        .card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        /* 加载动画 */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
@@ -1694,20 +2271,23 @@
             try {
                 // 显示二维码和团购码
                 qrcodeDiv.innerHTML = `
-                    <div style="text-align: center; padding: 10px;">
-                        <div id="qrCanvas" style="margin-bottom: 15px;"></div>
-                        <p style="font-size: 12px; color: #666; margin-bottom: 10px;">将二维码分享到群里<br>邻居扫码即可下单</p>
-                        <div style="background: #f5f5f5; padding: 10px; border-radius: 8px; margin-top: 10px;">
-                            <p style="font-size: 11px; color: #999; margin-bottom: 5px;">如果无法扫码，可使用团购码：</p>
-                            <button onclick="showGroupCodeModal('${groupCode}')" style="padding: 5px 15px; font-size: 12px; background: #07c160; color: white; border: none; border-radius: 4px;">查看团购码</button>
+                    <div style="text-align: center; padding: 20px;">
+                        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 16px; border-radius: 12px; margin-bottom: 20px;">
+                            <p style="font-size: 16px; font-weight: 600; margin: 0;">📱 扫码即可下单</p>
+                        </div>
+                        <div id="qrCanvas" style="margin-bottom: 20px; display: inline-block; padding: 16px; background: white; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.1);"></div>
+                        <p style="font-size: 13px; color: #666; margin-bottom: 15px;">将二维码分享到群里<br>邻居扫码即可下单</p>
+                        <div style="background: #f5f5f5; padding: 16px; border-radius: 12px; margin-top: 15px;">
+                            <p style="font-size: 12px; color: #999; margin-bottom: 10px;">如果无法扫码，可使用团购码：</p>
+                            <button onclick="showGroupCodeModal('${groupCode}')" style="padding: 10px 24px; font-size: 14px; background: linear-gradient(135deg, #07c160 0%, #06ad56 100%); color: white; border: none; border-radius: 20px; cursor: pointer; font-weight: 500; box-shadow: 0 2px 8px rgba(7, 193, 96, 0.3);">查看团购码</button>
                         </div>
                     </div>
                 `;
                 
                 new QRCode(document.getElementById('qrCanvas'), {
                     text: shopUrl,
-                    width: 220,
-                    height: 220,
+                    width: 240,
+                    height: 240,
                     colorDark: '#000000',
                     colorLight: '#ffffff',
                     correctLevel: QRCode.CorrectLevel.L
@@ -1727,25 +2307,42 @@
             const reasonText = urlLength ? `链接较长（${urlLength}字符），二维码无法扫描` : '商品较多';
             
             qrcodeDiv.innerHTML = `
-                <div style="padding: 20px; text-align: center;">
-                    <p style="color: #ff6b00; margin-bottom: 10px; font-size: 14px;">📱 请使用团购码分享</p>
-                    <p style="color: #999; font-size: 12px; margin-bottom: 15px;">${reasonText}<br>建议使用团购码方式分享</p>
-                    <div style="background: #f0f9ff; border: 1px solid #1890ff; border-radius: 8px; padding: 15px; margin-bottom: 15px;">
-                        <p style="font-size: 12px; color: #666; margin-bottom: 8px;"><b>团购码</b>（点击复制后发微信群）：</p>
-                        <textarea id="groupCodeText" style="width: 100%; height: 80px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 10px; font-family: monospace; resize: none;" readonly>${groupCode}</textarea>
-                        <button onclick="copyGroupCodeFromModal()" style="margin-top: 10px; padding: 10px 25px; background: #07c160; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">📋 复制团购码</button>
+                <div style="padding: 24px; text-align: center; max-width: 480px; margin: 0 auto;">
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 16px; margin-bottom: 20px;">
+                        <p style="font-size: 18px; font-weight: 600; margin-bottom: 8px;">📱 请使用团购码分享</p>
+                        <p style="font-size: 13px; opacity: 0.9;">${reasonText}，建议使用团购码方式分享</p>
                     </div>
-                    <div style="background: #fff7e6; border: 1px solid #ffd591; border-radius: 8px; padding: 12px; text-align: left;">
-                        <p style="font-size: 12px; color: #666; margin-bottom: 5px;"><b>📝 邻居使用步骤：</b></p>
-                        <ol style="font-size: 11px; color: #999; padding-left: 15px; margin: 0; line-height: 1.8;">
-                            <li>团长将团购码复制后发微信群</li>
-                            <li>邻居点击下方链接打开下单页面</li>
-                            <li>输入团购码，点击"加载商品"</li>
-                            <li>即可看到商品并下单</li>
-                        </ol>
-                        <div style="margin-top: 10px; padding: 8px; background: white; border-radius: 4px;">
-                            <p style="font-size: 11px; color: #666; margin: 0;">下单链接：</p>
-                            <p style="font-size: 10px; color: #1890ff; word-break: break-all; margin: 5px 0 0 0;">${window.location.href.split('?')[0]}</p>
+                    
+                    <div style="background: #f0f9ff; border: 2px solid #1890ff; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+                        <p style="font-size: 14px; color: #333; margin-bottom: 12px; font-weight: 600;">📋 团购码（点击复制后发微信群）：</p>
+                        <textarea id="groupCodeText" style="width: 100%; height: 120px; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 11px; font-family: monospace; resize: none; background: white;" readonly>${groupCode}</textarea>
+                        <button onclick="copyGroupCodeFull('${groupCode}')" style="margin-top: 15px; padding: 14px 40px; background: linear-gradient(135deg, #07c160 0%, #06ad56 100%); color: white; border: none; border-radius: 25px; cursor: pointer; font-size: 16px; font-weight: 600; box-shadow: 0 4px 12px rgba(7, 193, 96, 0.3);">📋 一键复制团购码</button>
+                        <p style="font-size: 12px; color: #999; margin-top: 10px;">复制后请直接粘贴到微信群</p>
+                    </div>
+                    
+                    <div style="background: #fff7e6; border: 1px solid #ffd591; border-radius: 12px; padding: 16px; text-align: left;">
+                        <p style="font-size: 14px; color: #333; margin-bottom: 12px; font-weight: 600;">📝 邻居使用步骤：</p>
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #666;">
+                                <span style="width: 24px; height: 24px; background: #1890ff; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0;">1</span>
+                                <span>团长将团购码复制后发微信群</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #666;">
+                                <span style="width: 24px; height: 24px; background: #1890ff; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0;">2</span>
+                                <span>邻居点击下方链接打开下单页面</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #666;">
+                                <span style="width: 24px; height: 24px; background: #1890ff; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0;">3</span>
+                                <span>输入团购码，点击"加载商品"</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #666;">
+                                <span style="width: 24px; height: 24px; background: #52c41a; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0;">✓</span>
+                                <span>即可看到商品并下单</span>
+                            </div>
+                        </div>
+                        <div style="margin-top: 15px; padding: 12px; background: white; border-radius: 8px; border: 1px solid #ffd591;">
+                            <p style="font-size: 12px; color: #666; margin: 0 0 5px 0;">下单链接：</p>
+                            <p style="font-size: 11px; color: #1890ff; word-break: break-all; margin: 0; font-family: monospace;">${window.location.href.split('?')[0]}</p>
                         </div>
                     </div>
                 </div>
@@ -1754,18 +2351,7 @@
         }
         
         function copyGroupCode(code) {
-            navigator.clipboard.writeText(code).then(() => {
-                showToast('团购码已复制');
-            }).catch(() => {
-                // 降级方案
-                const textArea = document.createElement('textarea');
-                textArea.value = code;
-                document.body.appendChild(textArea);
-                textArea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textArea);
-                showToast('团购码已复制');
-            });
+            copyGroupCodeFull(code);
         }
         
         function copyGroupCodeFromModal() {
@@ -1773,6 +2359,46 @@
             textarea.select();
             document.execCommand('copy');
             showToast('团购码已复制，请粘贴到微信群');
+        }
+        
+        // 复制完整团购码（团长端使用）
+        function copyGroupCodeFull(code) {
+            // 使用现代 Clipboard API
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(code).then(() => {
+                    showToast('✅ 团购码已复制，请粘贴到微信群');
+                }).catch(err => {
+                    console.error('复制失败:', err);
+                    // 降级方案
+                    fallbackCopy(code);
+                });
+            } else {
+                fallbackCopy(code);
+            }
+        }
+        
+        // 降级复制方案
+        function fallbackCopy(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    showToast('✅ 团购码已复制，请粘贴到微信群');
+                } else {
+                    showToast('复制失败，请长按文本框手动复制');
+                }
+            } catch (err) {
+                console.error('复制失败:', err);
+                showToast('复制失败，请长按文本框手动复制');
+            }
+            
+            document.body.removeChild(textarea);
         }
         
         // 显示复制链接弹窗（当二维码无法生成时）
@@ -1953,14 +2579,24 @@
                 container.innerHTML = `
                     <div class="empty-state" style="padding: 30px;">
                         <div class="empty-icon">📦</div>
-                        <p style="margin-bottom: 20px;">暂无商品，请输入团购码</p>
-                        <div style="max-width: 280px; margin: 0 auto;">
-                            <input type="text" id="groupCodeInput" class="form-input" placeholder="请输入团购码（如：abc123）" style="text-align: center; margin-bottom: 15px;">
-                            <button class="btn btn-primary" onclick="loadByGroupCode()">加载商品</button>
+                        <p style="margin-bottom: 15px; font-size: 16px; color: #333;">🛒 欢迎使用团购下单</p>
+                        <div style="background: #fff7e6; border: 1px solid #ffd591; border-radius: 8px; padding: 12px; margin-bottom: 20px; max-width: 300px; margin-left: auto; margin-right: auto;">
+                            <p style="font-size: 13px; color: #666; margin: 0; line-height: 1.6;">
+                                <b>使用步骤：</b><br>
+                                1. 向团长索取团购码<br>
+                                2. 长按下方输入框粘贴<br>
+                                3. 点击"加载商品"
+                            </p>
                         </div>
-                        <p style="margin-top: 20px; font-size: 13px; color: #999;">
-                            团购码可向团长索取<br>
-                            或重新扫描二维码
+                        <div style="max-width: 300px; margin: 0 auto;">
+                            <textarea id="groupCodeInput" class="form-input" placeholder="请长按此处粘贴团购码..." style="text-align: left; margin-bottom: 10px; height: 80px; font-size: 12px; font-family: monospace;"></textarea>
+                            <div style="display: flex; gap: 10px;">
+                                <button class="btn btn-secondary" onclick="pasteGroupCode()" style="flex: 1;">📋 粘贴</button>
+                                <button class="btn btn-primary" onclick="loadByGroupCode()" style="flex: 2;">加载商品</button>
+                            </div>
+                        </div>
+                        <p style="margin-top: 15px; font-size: 12px; color: #999;">
+                            💡 提示：团购码是一串很长的字符，请完整复制粘贴
                         </p>
                     </div>
                 `;
@@ -2128,20 +2764,52 @@
             document.getElementById('submitBtn').disabled = totalQty === 0;
         }
         
+        // 粘贴团购码（手机端一键粘贴）
+        async function pasteGroupCode() {
+            const input = document.getElementById('groupCodeInput');
+            
+            try {
+                // 尝试使用 Clipboard API
+                if (navigator.clipboard && navigator.clipboard.readText) {
+                    const text = await navigator.clipboard.readText();
+                    input.value = text.trim();
+                    showToast('已粘贴');
+                } else {
+                    // 降级方案：提示用户长按粘贴
+                    input.focus();
+                    showToast('请长按输入框选择粘贴');
+                }
+            } catch (e) {
+                console.error('粘贴失败:', e);
+                input.focus();
+                showToast('请长按输入框手动粘贴');
+            }
+        }
+        
         // 通过团购码加载商品数据（当二维码数据丢失时使用）
         function loadByGroupCode() {
             const codeInput = document.getElementById('groupCodeInput');
-            const code = codeInput.value.trim().toLowerCase();
+            // 不要转小写！Base64区分大小写。只去除前后空格
+            let code = codeInput.value.trim();
             
             if (!code) {
                 showToast('请输入团购码');
                 return;
             }
             
+            // 移除可能混入的换行符、空格等特殊字符
+            code = code.replace(/\s+/g, '');
+            
+            console.log('输入的团购码长度:', code.length);
+            console.log('团购码前50字符:', code.substring(0, 50));
+            
             // 解码团购码（先Base64解码，再URI解码，再JSON解析）
             try {
                 const decodedStr = decodeURIComponent(atob(code));
+                console.log('解码成功，数据长度:', decodedStr.length);
+                
                 const compact = JSON.parse(decodedStr);
+                console.log('JSON解析成功:', compact);
                 
                 // 解码数据
                 const shopName = compact.n || '小区团购';
@@ -2154,6 +2822,8 @@
                         stock: s[2] !== null && s[2] !== undefined ? s[2] : undefined
                     }))
                 }));
+                
+                console.log('解码后的商品数量:', products.length);
                 
                 // 保存到本地存储
                 Storage.set('products', products);
@@ -2175,7 +2845,7 @@
                 
             } catch (e) {
                 console.error('团购码解码失败:', e);
-                showToast('团购码无效，请重新输入');
+                alert('团购码无效或已损坏，请重新复制。错误: ' + e.message);
             }
         }
         
