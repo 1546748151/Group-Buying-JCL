@@ -1671,35 +1671,108 @@
             
             // 将数据压缩（先JSON，再URI编码，再Base64）
             const jsonStr = JSON.stringify(compactData);
-            const encodedData = btoa(jsonStr);
+            // 中文需要先encodeURIComponent再btoa
+            const encodedData = btoa(encodeURIComponent(jsonStr));
             
             // 生成下单链接
             const baseUrl = window.location.href.split('?')[0];
             const shopUrl = baseUrl + '?d=' + encodedData;  // 使用短参数名 'd'
             
+            // 生成团购码（用于手动输入）
+            const groupCode = encodedData;
+            
             console.log('二维码URL长度:', shopUrl.length);
             console.log('商品数量:', products.length);
+            console.log('团购码长度:', groupCode.length);
             
-            // 如果URL超过1500字符，提示使用链接分享
-            if (shopUrl.length > 1500) {
-                showCopyLinkModal(shopUrl);
+            // 如果URL超过800字符，二维码会太密集无法扫描，直接显示团购码方案
+            if (shopUrl.length > 800) {
+                showGroupCodeModal(groupCode, shopUrl.length);
                 return;
             }
             
             try {
-                new QRCode(qrcodeDiv, {
+                // 显示二维码和团购码
+                qrcodeDiv.innerHTML = `
+                    <div style="text-align: center; padding: 10px;">
+                        <div id="qrCanvas" style="margin-bottom: 15px;"></div>
+                        <p style="font-size: 12px; color: #666; margin-bottom: 10px;">将二维码分享到群里<br>邻居扫码即可下单</p>
+                        <div style="background: #f5f5f5; padding: 10px; border-radius: 8px; margin-top: 10px;">
+                            <p style="font-size: 11px; color: #999; margin-bottom: 5px;">如果无法扫码，可使用团购码：</p>
+                            <button onclick="showGroupCodeModal('${groupCode}')" style="padding: 5px 15px; font-size: 12px; background: #07c160; color: white; border: none; border-radius: 4px;">查看团购码</button>
+                        </div>
+                    </div>
+                `;
+                
+                new QRCode(document.getElementById('qrCanvas'), {
                     text: shopUrl,
-                    width: 200,
-                    height: 200,
+                    width: 220,
+                    height: 220,
                     colorDark: '#000000',
                     colorLight: '#ffffff',
-                    correctLevel: QRCode.CorrectLevel.L  // 使用低纠错级别，让二维码更简单
+                    correctLevel: QRCode.CorrectLevel.L
                 });
                 modal.classList.add('active');
             } catch (e) {
                 console.error('二维码生成失败:', e);
-                showCopyLinkModal(shopUrl);
+                showGroupCodeModal(groupCode);
             }
+        }
+        
+        // 显示团购码弹窗（当二维码无法生成或URL太长时使用）
+        function showGroupCodeModal(groupCode, urlLength) {
+            const modal = document.getElementById('qrModal');
+            const qrcodeDiv = document.getElementById('qrcode');
+            
+            const reasonText = urlLength ? `链接较长（${urlLength}字符），二维码无法扫描` : '商品较多';
+            
+            qrcodeDiv.innerHTML = `
+                <div style="padding: 20px; text-align: center;">
+                    <p style="color: #ff6b00; margin-bottom: 10px; font-size: 14px;">📱 请使用团购码分享</p>
+                    <p style="color: #999; font-size: 12px; margin-bottom: 15px;">${reasonText}<br>建议使用团购码方式分享</p>
+                    <div style="background: #f0f9ff; border: 1px solid #1890ff; border-radius: 8px; padding: 15px; margin-bottom: 15px;">
+                        <p style="font-size: 12px; color: #666; margin-bottom: 8px;"><b>团购码</b>（点击复制后发微信群）：</p>
+                        <textarea id="groupCodeText" style="width: 100%; height: 80px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 10px; font-family: monospace; resize: none;" readonly>${groupCode}</textarea>
+                        <button onclick="copyGroupCodeFromModal()" style="margin-top: 10px; padding: 10px 25px; background: #07c160; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">📋 复制团购码</button>
+                    </div>
+                    <div style="background: #fff7e6; border: 1px solid #ffd591; border-radius: 8px; padding: 12px; text-align: left;">
+                        <p style="font-size: 12px; color: #666; margin-bottom: 5px;"><b>📝 邻居使用步骤：</b></p>
+                        <ol style="font-size: 11px; color: #999; padding-left: 15px; margin: 0; line-height: 1.8;">
+                            <li>团长将团购码复制后发微信群</li>
+                            <li>邻居点击下方链接打开下单页面</li>
+                            <li>输入团购码，点击"加载商品"</li>
+                            <li>即可看到商品并下单</li>
+                        </ol>
+                        <div style="margin-top: 10px; padding: 8px; background: white; border-radius: 4px;">
+                            <p style="font-size: 11px; color: #666; margin: 0;">下单链接：</p>
+                            <p style="font-size: 10px; color: #1890ff; word-break: break-all; margin: 5px 0 0 0;">${window.location.href.split('?')[0]}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            modal.classList.add('active');
+        }
+        
+        function copyGroupCode(code) {
+            navigator.clipboard.writeText(code).then(() => {
+                showToast('团购码已复制');
+            }).catch(() => {
+                // 降级方案
+                const textArea = document.createElement('textarea');
+                textArea.value = code;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                showToast('团购码已复制');
+            });
+        }
+        
+        function copyGroupCodeFromModal() {
+            const textarea = document.getElementById('groupCodeText');
+            textarea.select();
+            document.execCommand('copy');
+            showToast('团购码已复制，请粘贴到微信群');
         }
         
         // 显示复制链接弹窗（当二维码无法生成时）
@@ -1756,15 +1829,15 @@
             const oldData = urlParams.get('data');   // 旧格式：兼容
             
             if (compactData) {
-                // 新格式：紧凑数据解码
+                // 新格式：紧凑数据解码（先Base64解码，再URI解码，再JSON解析）
                 try {
                     console.log('解码紧凑数据，长度:', compactData.length);
                     console.log('数据内容:', compactData);
                     
-                    const jsonStr = atob(compactData);
-                    console.log('Base64解码后:', jsonStr);
+                    const decodedStr = decodeURIComponent(atob(compactData));
+                    console.log('Base64+URI解码后:', decodedStr);
                     
-                    const compact = JSON.parse(jsonStr);
+                    const compact = JSON.parse(decodedStr);
                     console.log('JSON解析结果:', compact);
                     
                     // 解码紧凑格式
@@ -1876,10 +1949,19 @@
             
             const container = document.getElementById('shopProductList');
             if (products.length === 0) {
+                // 没有商品时显示输入团购码界面
                 container.innerHTML = `
-                    <div class="empty-state">
+                    <div class="empty-state" style="padding: 30px;">
                         <div class="empty-icon">📦</div>
-                        <p>暂无商品上架</p>
+                        <p style="margin-bottom: 20px;">暂无商品，请输入团购码</p>
+                        <div style="max-width: 280px; margin: 0 auto;">
+                            <input type="text" id="groupCodeInput" class="form-input" placeholder="请输入团购码（如：abc123）" style="text-align: center; margin-bottom: 15px;">
+                            <button class="btn btn-primary" onclick="loadByGroupCode()">加载商品</button>
+                        </div>
+                        <p style="margin-top: 20px; font-size: 13px; color: #999;">
+                            团购码可向团长索取<br>
+                            或重新扫描二维码
+                        </p>
                     </div>
                 `;
             } else {
@@ -2044,6 +2126,57 @@
             document.getElementById('cartTotal').textContent = `¥${totalAmount.toFixed(2)}`;
             document.getElementById('cartCount').textContent = `已选 ${totalQty} 件`;
             document.getElementById('submitBtn').disabled = totalQty === 0;
+        }
+        
+        // 通过团购码加载商品数据（当二维码数据丢失时使用）
+        function loadByGroupCode() {
+            const codeInput = document.getElementById('groupCodeInput');
+            const code = codeInput.value.trim().toLowerCase();
+            
+            if (!code) {
+                showToast('请输入团购码');
+                return;
+            }
+            
+            // 解码团购码（先Base64解码，再URI解码，再JSON解析）
+            try {
+                const decodedStr = decodeURIComponent(atob(code));
+                const compact = JSON.parse(decodedStr);
+                
+                // 解码数据
+                const shopName = compact.n || '小区团购';
+                const products = (compact.p || []).map(item => ({
+                    id: item[0],
+                    name: item[1],
+                    specs: item[2].map(s => ({
+                        name: s[0],
+                        price: s[1],
+                        stock: s[2] !== null && s[2] !== undefined ? s[2] : undefined
+                    }))
+                }));
+                
+                // 保存到本地存储
+                Storage.set('products', products);
+                Storage.set('shopName', shopName);
+                
+                if (compact.d && Array.isArray(compact.d) && compact.d[0] === 1) {
+                    Storage.set('deadline', {
+                        enabled: true,
+                        time: compact.d[1] ? new Date(compact.d[1]).toISOString() : null
+                    });
+                }
+                
+                showToast('商品加载成功！');
+                
+                // 重新初始化页面
+                setTimeout(() => {
+                    initShopPage();
+                }, 500);
+                
+            } catch (e) {
+                console.error('团购码解码失败:', e);
+                showToast('团购码无效，请重新输入');
+            }
         }
         
         function submitOrder() {
