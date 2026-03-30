@@ -1113,11 +1113,18 @@
         }
         
         function checkDeadline() {
-            const deadline = Storage.get('deadline');
-            if (!deadline || !deadline.enabled || !deadline.time) return false;
-            
-            const deadlineTime = new Date(deadline.time).getTime();
-            return Date.now() > deadlineTime;
+            try {
+                const deadline = Storage.get('deadline');
+                if (!deadline || !deadline.enabled || !deadline.time) return false;
+                
+                const deadlineTime = new Date(deadline.time).getTime();
+                if (isNaN(deadlineTime)) return false; // 无效日期
+                
+                return Date.now() > deadlineTime;
+            } catch (e) {
+                console.error('检查截止时间出错:', e);
+                return false;
+            }
         }
         
         function getDeadlineText() {
@@ -1636,45 +1643,86 @@
             const deadline = Storage.get('deadline') || { enabled: false };
             const shopName = Storage.get('shopName') || '小区团购';
             
-            // 简化商品数据（不包含图片，避免URL过长）
-            const simplifiedProducts = products.map(p => ({
-                id: p.id,
-                name: p.name,
-                specs: p.specs
-                // 注意：不包含 image 字段，因为base64图片会让URL太长
-            }));
+            if (products.length === 0) {
+                showToast('请先添加商品');
+                return;
+            }
             
-            // 构建数据对象
-            const shopData = {
-                name: shopName,
-                products: simplifiedProducts,
-                deadline: deadline
+            // 超精简商品数据格式（使用数组代替对象，减少字段名长度）
+            // 格式: [id, name, [[specName, price, stock], ...]]
+            const compactProducts = products.map(p => [
+                p.id,
+                p.name,
+                p.specs.map(s => [s.name, s.price, s.stock !== undefined ? s.stock : null])
+            ]);
+            
+            // 超精简截止时间格式
+            const compactDeadline = deadline.enabled ? [
+                1,  // enabled = true
+                deadline.time ? new Date(deadline.time).getTime() : 0  // 使用时间戳
+            ] : [0];  // enabled = false
+            
+            // 构建紧凑数据对象
+            const compactData = {
+                n: shopName,  // name
+                p: compactProducts,  // products
+                d: compactDeadline  // deadline
             };
             
-            // 将数据编码为Base64（压缩URL长度）
-            const dataStr = JSON.stringify(shopData);
-            const encodedData = btoa(encodeURIComponent(dataStr));
+            // 将数据压缩（先JSON，再URI编码，再Base64）
+            const jsonStr = JSON.stringify(compactData);
+            const encodedData = btoa(jsonStr);
             
-            // 生成下单链接（包含商品数据）
+            // 生成下单链接
             const baseUrl = window.location.href.split('?')[0];
-            const shopUrl = baseUrl + '?data=' + encodedData;
+            const shopUrl = baseUrl + '?d=' + encodedData;  // 使用短参数名 'd'
             
-            console.log('二维码URL长度:', shopUrl.length); // 调试用
+            console.log('二维码URL长度:', shopUrl.length);
+            console.log('商品数量:', products.length);
+            
+            // 如果URL超过1500字符，提示使用链接分享
+            if (shopUrl.length > 1500) {
+                showCopyLinkModal(shopUrl);
+                return;
+            }
             
             try {
                 new QRCode(qrcodeDiv, {
                     text: shopUrl,
-                    width: 180,
-                    height: 180,
+                    width: 200,
+                    height: 200,
                     colorDark: '#000000',
                     colorLight: '#ffffff',
-                    correctLevel: QRCode.CorrectLevel.M
+                    correctLevel: QRCode.CorrectLevel.L  // 使用低纠错级别，让二维码更简单
                 });
                 modal.classList.add('active');
             } catch (e) {
                 console.error('二维码生成失败:', e);
-                showToast('商品太多，请减少商品数量或删除图片后重试');
+                showCopyLinkModal(shopUrl);
             }
+        }
+        
+        // 显示复制链接弹窗（当二维码无法生成时）
+        function showCopyLinkModal(url) {
+            const modal = document.getElementById('qrModal');
+            const qrcodeDiv = document.getElementById('qrcode');
+            
+            qrcodeDiv.innerHTML = `
+                <div style="padding: 20px; text-align: center;">
+                    <p style="color: #ff4d4f; margin-bottom: 15px;">商品较多，建议使用链接分享</p>
+                    <textarea id="shareLinkText" style="width: 100%; height: 80px; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px;" readonly>${url}</textarea>
+                    <button onclick="copyShareLink()" style="margin-top: 10px; padding: 10px 20px; background: #07c160; color: white; border: none; border-radius: 4px; cursor: pointer;">复制链接</button>
+                    <p style="font-size: 12px; color: #999; margin-top: 10px;">复制后发送到微信群即可</p>
+                </div>
+            `;
+            modal.classList.add('active');
+        }
+        
+        function copyShareLink() {
+            const textarea = document.getElementById('shareLinkText');
+            textarea.select();
+            document.execCommand('copy');
+            showToast('链接已复制，请粘贴到微信群');
         }
         
         function closeQRModal() {
@@ -1694,42 +1742,113 @@
         
         // ==================== 用户下单页面 ====================
         function initShopPage() {
+            console.log('=== initShopPage 开始 ===');
+            
             // 尝试从URL参数读取商品数据（邻居扫码）
             let products = [];
             let shopName = '小区团购';
             let urlDeadline = null;
             
-            const urlParams = new URLSearchParams(window.location.search);
-            const encodedData = urlParams.get('data');
+            try {
             
-            if (encodedData) {
-                // 从二维码数据解码
+            const urlParams = new URLSearchParams(window.location.search);
+            const compactData = urlParams.get('d');  // 新格式：紧凑编码
+            const oldData = urlParams.get('data');   // 旧格式：兼容
+            
+            if (compactData) {
+                // 新格式：紧凑数据解码
                 try {
-                    console.log('解码数据长度:', encodedData.length);
-                    const decodedStr = decodeURIComponent(atob(encodedData));
-                    console.log('解码后字符串长度:', decodedStr.length);
+                    console.log('解码紧凑数据，长度:', compactData.length);
+                    console.log('数据内容:', compactData);
+                    
+                    const jsonStr = atob(compactData);
+                    console.log('Base64解码后:', jsonStr);
+                    
+                    const compact = JSON.parse(jsonStr);
+                    console.log('JSON解析结果:', compact);
+                    
+                    // 解码紧凑格式
+                    shopName = compact.n || '小区团购';
+                    console.log('店铺名称:', shopName);
+                    
+                    // 解码商品 [id, name, [[specName, price, stock], ...]]
+                    if (compact.p && Array.isArray(compact.p)) {
+                        products = compact.p.map((item, index) => {
+                            console.log(`解码商品${index}:`, item);
+                            if (!Array.isArray(item) || item.length < 3) {
+                                console.error(`商品${index}格式错误:`, item);
+                                return null;
+                            }
+                            if (!Array.isArray(item[2])) {
+                                console.error(`商品${index}规格格式错误:`, item[2]);
+                                return null;
+                            }
+                            return {
+                                id: item[0],
+                                name: item[1],
+                                specs: item[2].map((s, sidx) => {
+                                    console.log(`  规格${sidx}:`, s);
+                                    if (!Array.isArray(s) || s.length < 2) {
+                                        console.error(`  规格${sidx}格式错误:`, s);
+                                        return { name: '默认', price: 0, stock: undefined };
+                                    }
+                                    return {
+                                        name: s[0],
+                                        price: s[1],
+                                        stock: s[2] !== null && s[2] !== undefined ? s[2] : undefined
+                                    };
+                                })
+                            };
+                        }).filter(p => p !== null);
+                    }
+                    
+                    console.log('解码后的商品:', products);
+                    
+                    // 解码截止时间 [enabled, timestamp]
+                    if (compact.d && Array.isArray(compact.d) && compact.d[0] === 1) {
+                        urlDeadline = {
+                            enabled: true,
+                            time: compact.d[1] ? new Date(compact.d[1]).toISOString() : null
+                        };
+                    }
+                    
+                    console.log('成功解码，商品数量:', products.length);
+                    
+                    // 保存到邻居本地存储
+                    if (products.length > 0) {
+                        Storage.set('products', products);
+                        Storage.set('shopName', shopName);
+                        if (urlDeadline) {
+                            Storage.set('deadline', urlDeadline);
+                        }
+                    }
+                } catch (e) {
+                    console.error('解码紧凑数据失败:', e);
+                    alert('链接数据解码失败: ' + e.message);
+                    products = Storage.get('products') || [];
+                    shopName = Storage.get('shopName') || '小区团购';
+                }
+            } else if (oldData) {
+                // 旧格式：兼容之前的二维码
+                try {
+                    const decodedStr = decodeURIComponent(atob(oldData));
                     const shopData = JSON.parse(decodedStr);
                     products = shopData.products || [];
                     shopName = shopData.name || '小区团购';
                     urlDeadline = shopData.deadline;
                     
-                    console.log('成功解码，商品数量:', products.length);
-                    
-                    // 将团长数据保存到邻居的本地存储
                     Storage.set('products', products);
                     Storage.set('shopName', shopName);
                     if (urlDeadline) {
                         Storage.set('deadline', urlDeadline);
                     }
                 } catch (e) {
-                    console.error('解码失败', e);
-                    showToast('二维码数据有误，请重新生成');
-                    // 解码失败时使用本地存储的数据（如果有）
+                    console.error('解码旧格式失败:', e);
                     products = Storage.get('products') || [];
                     shopName = Storage.get('shopName') || '小区团购';
                 }
             } else {
-                // 兼容旧方式：从本地存储读取（团长自己测试）
+                // 从本地存储读取（团长自己测试或已访问过的邻居）
                 products = Storage.get('products') || [];
                 shopName = Storage.get('shopName') || '小区团购';
             }
@@ -1764,16 +1883,24 @@
                     </div>
                 `;
             } else {
-                container.innerHTML = products.map(p => {
+                container.innerHTML = products.map((p, pidx) => {
+                    // 确保商品数据完整
+                    if (!p || !p.id || !p.name) {
+                        console.error(`商品${pidx}数据不完整:`, p);
+                        return '';
+                    }
+                    
+                    // 确保specs是数组
+                    const specs = Array.isArray(p.specs) && p.specs.length > 0 ? p.specs : [{ name: '默认', price: 0, stock: undefined }];
                     const cartId = `${p.id}-0`;
                     const cartQty = currentUserCart[cartId]?.quantity || 0;
-                    const hasSpecs = p.specs.length > 1;
+                    const hasSpecs = specs.length > 1;
                     
                     return `
                         <div class="product-item" data-product-id="${p.id}">
                             ${p.image ? 
                                 `<img src="${p.image}" class="product-img" alt="${p.name}">` : 
-                                `<div class="product-img-placeholder">${p.name.charAt(0)}</div>`
+                                `<div class="product-img-placeholder">${(p.name || '?').charAt(0)}</div>`
                             }
                             <div class="product-info" style="flex: 1;">
                                 <div class="product-name">${p.name}</div>
@@ -1782,24 +1909,24 @@
                                     <div class="spec-group">
                                         <div class="spec-group-label">选择规格：</div>
                                         <div class="spec-options">
-                                            ${p.specs.map((spec, idx) => `
+                                            ${specs.map((spec, idx) => `
                                                 <button class="spec-option ${idx === 0 ? 'selected' : ''}" 
                                                         data-spec-idx="${idx}"
-                                                        data-price="${spec.price}"
+                                                        data-price="${spec.price || 0}"
                                                         data-stock="${spec.stock !== undefined ? spec.stock : '∞'}"
                                                         onclick="selectSpec('${p.id}', ${idx}, this)">
-                                                    ${spec.name} ¥${spec.price}
+                                                    ${spec.name || '默认'} ¥${spec.price || 0}
                                                 </button>
                                             `).join('')}
                                         </div>
                                     </div>
                                     <div class="product-stock" style="margin-top: 5px;">
-                                        库存: <span class="current-stock">${p.specs[0].stock !== undefined ? p.specs[0].stock : '不限'}</span>
+                                        库存: <span class="current-stock">${specs[0].stock !== undefined ? specs[0].stock : '不限'}</span>
                                     </div>
                                 ` : `
-                                    <div class="product-price">¥${p.specs[0].price.toFixed(2)}</div>
+                                    <div class="product-price">¥${(specs[0].price || 0).toFixed(2)}</div>
                                     <div class="product-stock">
-                                        库存: ${p.specs[0].stock !== undefined ? p.specs[0].stock : '不限'}
+                                        库存: ${specs[0].stock !== undefined ? specs[0].stock : '不限'}
                                     </div>
                                 `}
                                 
@@ -1811,7 +1938,18 @@
                             </div>
                         </div>
                     `;
-                }).join('');
+                }).filter(html => html !== '').join('');
+                
+                console.log('渲染完成，商品HTML长度:', container.innerHTML.length);
+                
+                if (container.innerHTML === '') {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">⚠️</div>
+                            <p>商品数据有误，请重新生成二维码</p>
+                        </div>
+                    `;
+                }
                 
                 // 初始化每个商品的规格选择状态
                 products.forEach(p => {
@@ -1820,6 +1958,12 @@
             }
             
             updateCartDisplay();
+            
+            console.log('=== initShopPage 完成 ===');
+            } catch (e) {
+                console.error('initShopPage 出错:', e);
+                alert('页面加载出错: ' + e.message);
+            }
         }
         
         function updateDeadlineTimer() {
@@ -1998,8 +2142,8 @@
         document.addEventListener('DOMContentLoaded', function() {
             // 检查URL参数
             const urlParams = new URLSearchParams(window.location.search);
-            // 支持 data 参数（新方式：二维码携带商品数据）或 shop=1（旧方式）
-            if (urlParams.get('data') || urlParams.get('shop') === '1') {
+            // 支持 d（新紧凑格式）、data（旧格式）、shop=1（旧方式）
+            if (urlParams.get('d') || urlParams.get('data') || urlParams.get('shop') === '1') {
                 showPage('shopPage');
                 initShopPage();
             }
