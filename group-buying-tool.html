@@ -762,13 +762,28 @@
         .modal-content {
             background: white;
             border-radius: var(--radius-lg);
-            width: 92%;
-            max-width: 520px;
-            max-height: 85vh;
+            width: 95%;
+            max-width: 680px;
+            max-height: 90vh;
             overflow-y: auto;
             box-shadow: var(--shadow-lg);
             animation: slideUp 0.3s ease;
-            margin: 20px auto;
+            margin: 16px auto;
+        }
+        
+        /* 二维码弹窗专用样式 - 更大 */
+        #qrModal .modal-content {
+            max-width: 600px;
+            width: 98%;
+        }
+        
+        /* 保存按钮更大 */
+        .save-qr-btn {
+            width: 100%;
+            padding: 16px 32px;
+            font-size: 17px;
+            font-weight: 600;
+            border-radius: 30px;
         }
         
         @keyframes slideUp {
@@ -1406,6 +1421,30 @@
         <div class="container page-content">
             <!-- 商品管理 -->
             <div id="productsTab" class="tab-content">
+                <!-- 数据同步提示 -->
+                <div style="background: linear-gradient(135deg, #fff2f0 0%, #fff5f5 100%); border: 2px solid #ffccc7; border-radius: 12px; padding: 20px; margin-bottom: 16px;">
+                    <div style="display: flex; align-items: flex-start; gap: 14px;">
+                        <span style="font-size: 24px;">⚠️</span>
+                        <div style="flex: 1;">
+                            <p style="font-size: 15px; color: #cf1322; font-weight: 600; margin: 0 0 8px 0;">重要限制：纯前端工具无法实时数据同步</p>
+                            <p style="font-size: 13px; color: #595959; margin: 0 0 12px 0; line-height: 1.7;">
+                                由于本工具是静态页面（无服务器），所有数据存储在各自浏览器中：<br>
+                                • <b>库存无法实时同步</b> - 无法防止超卖，库存仅作参考<br>
+                                • <b>订单分散在各设备</b> - 每台设备的订单互不相通
+                            </p>
+                            <div style="background: white; border-radius: 8px; padding: 12px; border: 1px solid #ffccc7;">
+                                <p style="font-size: 13px; color: #333; margin: 0 0 8px 0; font-weight: 600;">✅ 推荐解决方案：</p>
+                                <ol style="font-size: 13px; color: #595959; margin: 0; padding-left: 18px; line-height: 1.8;">
+                                    <li><b>固定使用一台设备管理</b>（推荐手机）</li>
+                                    <li>设置合理的<b>下单截止时间</b>控制接单量</li>
+                                    <li>如需使用多设备，请使用<b>订单导入</b>功能合并（见订单管理页）</li>
+                                    <li>库存功能<b>仅供参考</b>，建议通过微信群实时同步库存状态</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
                 <div class="deadline-section" id="deadlineSection">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                         <span style="font-weight: 500;">下单截止时间</span>
@@ -1430,6 +1469,24 @@
             
             <!-- 订单管理 -->
             <div id="ordersTab" class="tab-content hidden">
+                <!-- 订单导入功能 -->
+                <div style="background: linear-gradient(135deg, #f6ffed 0%, #e6f7ff 100%); border: 1px solid #b7eb8f; border-radius: 12px; padding: 20px; margin-bottom: 16px;">
+                    <div style="display: flex; align-items: flex-start; gap: 14px;">
+                        <span style="font-size: 24px;">📥</span>
+                        <div style="flex: 1;">
+                            <p style="font-size: 15px; color: #389e0d; font-weight: 600; margin: 0 0 8px 0;">多设备订单合并</p>
+                            <p style="font-size: 13px; color: #595959; margin: 0 0 12px 0; line-height: 1.6;">
+                                如果您在多台设备上收到订单，可以在此合并。<br>
+                                在其他设备上点击"导出订单码"，复制后在此导入。
+                            </p>
+                            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                                <button class="btn btn-small" onclick="showImportOrdersModal()" style="background: linear-gradient(135deg, #52c41a 0%, #389e0d 100%); color: white; border: none; padding: 8px 16px; font-weight: 500;">📥 导入订单</button>
+                                <button class="btn btn-small" onclick="showExportOrdersModal()" style="background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%); color: white; border: none; padding: 8px 16px; font-weight: 500;">📤 导出订单码</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
                 <div class="summary-card">
                     <div class="summary-title">总订单金额</div>
                     <div class="summary-value" id="totalAmount">¥0.00</div>
@@ -1531,18 +1588,21 @@
                     <input type="file" id="productImage" class="hidden" accept="image/*" onchange="handleImageSelect(event)">
                 </div>
                 <div class="form-group">
-                    <label class="form-label">规格设置</label>
+                    <label class="form-label">规格设置 <span style="font-size: 12px; color: #999; font-weight: normal;">（库存仅供参考，无法实时同步）</span></label>
                     <div id="specsContainer">
                         <div class="spec-editor">
                             <div class="spec-row">
                                 <input type="text" class="form-input" placeholder="规格名称（如：1斤装）" data-spec-name>
                                 <input type="number" class="form-input form-input-small" placeholder="价格" data-spec-price>
-                                <input type="number" class="form-input form-input-small" placeholder="库存" data-spec-stock>
+                                <input type="number" class="form-input form-input-small" placeholder="库存（可选）" data-spec-stock>
                                 <span style="color: #ff4d4f; cursor: pointer;" onclick="removeSpecRow(this)">删除</span>
                             </div>
                         </div>
                     </div>
-                    <button type="button" class="btn btn-small btn-secondary" onclick="addSpecRow()">+ 添加规格</button>
+                    <div style="margin-top: 8px; font-size: 12px; color: #999; line-height: 1.5;">
+                        💡 <b>库存提示：</b>由于无法实时同步，建议设置截止时间后统一处理，或在微信群实时同步库存状态
+                    </div>
+                    <button type="button" class="btn btn-small btn-secondary" onclick="addSpecRow()" style="margin-top: 12px;">+ 添加规格</button>
                 </div>
             </div>
             <div class="modal-footer">
@@ -1554,19 +1614,16 @@
 
     <!-- 二维码弹窗 -->
     <div id="qrModal" class="modal">
-        <div class="modal-content" style="max-width: 300px;">
+        <div class="modal-content">
             <div class="modal-header">
-                <span class="modal-title">扫码即可下单</span>
+                <span class="modal-title">📱 扫码即可下单</span>
                 <span class="modal-close" onclick="closeQRModal()">&times;</span>
             </div>
-            <div class="modal-body">
-                <div class="qr-section">
-                    <div id="qrcode"></div>
-                    <p class="qr-tip">将二维码分享到群里<br>邻居扫码即可下单</p>
-                </div>
+            <div class="modal-body" style="padding: 24px 32px;">
+                <div id="qrcode"></div>
             </div>
-            <div class="modal-footer">
-                <button class="btn btn-primary" onclick="downloadQRCode()">保存二维码</button>
+            <div class="modal-footer" style="padding: 24px 32px;">
+                <button class="btn btn-primary save-qr-btn" onclick="downloadQRCode()">📥 保存二维码</button>
             </div>
         </div>
     </div>
@@ -2148,6 +2205,211 @@
             showToast('订单已导出');
         }
         
+        // ==================== 订单导入导出（多设备同步） ====================
+        
+        // 显示导出订单码弹窗
+        function showExportOrdersModal() {
+            const orders = Storage.get('orders') || [];
+            
+            if (orders.length === 0) {
+                showToast('当前没有订单可导出');
+                return;
+            }
+            
+            // 压缩订单数据
+            const compactOrders = orders.map(o => ({
+                n: o.nickname,      // name
+                t: o.total,         // total
+                d: o.time,          // time
+                i: o.items.map(item => [   // items: [productName, specName, price, quantity]
+                    item.productName,
+                    item.specName,
+                    item.price,
+                    item.quantity
+                ]),
+                note: o.note
+            }));
+            
+            const jsonStr = JSON.stringify(compactOrders);
+            const encodedOrders = btoa(encodeURIComponent(jsonStr));
+            
+            console.log('订单数据长度:', encodedOrders.length);
+            
+            const modal = document.getElementById('qrModal');
+            const qrcodeDiv = document.getElementById('qrcode');
+            
+            qrcodeDiv.innerHTML = `
+                <div style="padding: 28px; text-align: center;">
+                    <div style="background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%); color: white; padding: 24px; border-radius: 16px; margin-bottom: 24px;">
+                        <p style="font-size: 20px; font-weight: 600; margin: 0 0 8px 0;">📤 导出订单码</p>
+                        <p style="font-size: 14px; opacity: 0.9; margin: 0;">共有 ${orders.length} 个订单等待同步</p>
+                    </div>
+                    
+                    <div style="background: #e6f7ff; border: 2px solid #1890ff; border-radius: 14px; padding: 24px;">
+                        <p style="font-size: 15px; color: #333; margin-bottom: 16px; font-weight: 600;">📋 订单码（复制后在另一设备导入）：</p>
+                        <textarea id="exportOrdersText" style="width: 100%; height: 160px; padding: 14px; border: 1px solid #ddd; border-radius: 10px; font-size: 12px; font-family: monospace; resize: none; background: white;" readonly>${encodedOrders}</textarea>
+                        <button onclick="copyExportOrdersCode()" style="margin-top: 18px; padding: 16px 48px; background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%); color: white; border: none; border-radius: 28px; cursor: pointer; font-size: 17px; font-weight: 600; box-shadow: 0 4px 16px rgba(24, 144, 255, 0.35);">📋 复制订单码</button>
+                        <p style="font-size: 13px; color: #666; margin-top: 12px;">复制后请在另一台设备点击"导入订单"粘贴</p>
+                    </div>
+                </div>
+            `;
+            modal.classList.add('active');
+        }
+        
+        // 复制导出的订单码
+        function copyExportOrdersCode() {
+            const textarea = document.getElementById('exportOrdersText');
+            const code = textarea.value;
+            
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(code).then(() => {
+                    showToast('✅ 订单码已复制');
+                }).catch(() => {
+                    fallbackCopy(code);
+                });
+            } else {
+                fallbackCopy(code);
+            }
+        }
+        
+        // 显示导入订单弹窗
+        function showImportOrdersModal() {
+            const modal = document.getElementById('qrModal');
+            const qrcodeDiv = document.getElementById('qrcode');
+            
+            qrcodeDiv.innerHTML = `
+                <div style="padding: 28px; text-align: center;">
+                    <div style="background: linear-gradient(135deg, #52c41a 0%, #389e0d 100%); color: white; padding: 24px; border-radius: 16px; margin-bottom: 24px;">
+                        <p style="font-size: 20px; font-weight: 600; margin: 0 0 8px 0;">📥 导入订单</p>
+                        <p style="font-size: 14px; opacity: 0.9; margin: 0;">将从其他设备复制的订单码粘贴到下方</p>
+                    </div>
+                    
+                    <div style="background: #f6ffed; border: 2px solid #52c41a; border-radius: 14px; padding: 24px;">
+                        <label style="display: block; text-align: left; font-size: 14px; color: #333; margin-bottom: 10px; font-weight: 500;">订单码：</label>
+                        <textarea id="importOrdersInput" class="form-input" placeholder="请在此粘贴从其他设备复制的订单码..." style="width: 100%; height: 140px; padding: 14px; font-size: 13px; font-family: monospace; resize: none; margin-bottom: 16px; border: 2px solid #d9f7be; border-radius: 10px; background: white;"></textarea>
+                        <div style="display: flex; gap: 12px;">
+                            <button class="btn btn-secondary" onclick="pasteImportOrdersCode()" style="flex: 1; padding: 14px; font-size: 15px; border-radius: 10px;">📋 粘贴</button>
+                            <button class="btn btn-primary" onclick="doImportOrders()" style="flex: 2; padding: 14px; font-size: 15px; border-radius: 10px; background: linear-gradient(135deg, #52c41a 0%, #389e0d 100%); font-weight: 600;">🚀 导入订单</button>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 20px; padding: 14px; background: #fff7e6; border-radius: 10px; text-align: left;">
+                        <p style="font-size: 13px; color: #d46b08; margin: 0; line-height: 1.6;">
+                            ⚠️ <b>注意：</b><br>
+                            • 导入的订单将与现有订单合并<br>
+                            • 同一用户的订单会被覆盖（保留最新的）<br>
+                            • 请确保订单码完整复制，不要遗漏字符
+                        </p>
+                    </div>
+                </div>
+            `;
+            modal.classList.add('active');
+        }
+        
+        // 粘贴订单码
+        async function pasteImportOrdersCode() {
+            const input = document.getElementById('importOrdersInput');
+            try {
+                if (navigator.clipboard && navigator.clipboard.readText) {
+                    const text = await navigator.clipboard.readText();
+                    input.value = text.trim();
+                    showToast('已粘贴');
+                } else {
+                    input.focus();
+                    showToast('请长按输入框选择粘贴');
+                }
+            } catch (e) {
+                input.focus();
+                showToast('请长按输入框手动粘贴');
+            }
+        }
+        
+        // 执行订单导入
+        function doImportOrders() {
+            const input = document.getElementById('importOrdersInput');
+            let code = input.value.trim();
+            
+            if (!code) {
+                showToast('请输入订单码');
+                return;
+            }
+            
+            // 清理特殊字符
+            code = code.replace(/\s+/g, '');
+            
+            try {
+                // 解码
+                const decodedStr = decodeURIComponent(atob(code));
+                const importedOrders = JSON.parse(decodedStr);
+                
+                if (!Array.isArray(importedOrders) || importedOrders.length === 0) {
+                    throw new Error('订单数据格式错误');
+                }
+                
+                // 获取现有订单
+                const existingOrders = Storage.get('orders') || [];
+                const existingMap = {};
+                existingOrders.forEach(o => {
+                    existingMap[o.nickname] = o;
+                });
+                
+                let importCount = 0;
+                let mergeCount = 0;
+                
+                // 合并订单
+                importedOrders.forEach(imported => {
+                    // 转换格式
+                    const order = {
+                        id: Date.now() + Math.random(),
+                        nickname: imported.n,
+                        total: imported.t,
+                        time: imported.d || new Date().toLocaleString(),
+                        items: imported.i.map(item => ({
+                            productName: item[0],
+                            specName: item[1],
+                            price: item[2],
+                            quantity: item[3]
+                        })),
+                        note: imported.note || ''
+                    };
+                    
+                    if (existingMap[order.nickname]) {
+                        // 已存在，覆盖
+                        const idx = existingOrders.findIndex(o => o.nickname === order.nickname);
+                        if (idx >= 0) {
+                            existingOrders[idx] = order;
+                            mergeCount++;
+                        }
+                    } else {
+                        // 新增
+                        existingOrders.push(order);
+                        importCount++;
+                    }
+                });
+                
+                // 保存
+                Storage.set('orders', existingOrders);
+                
+                // 刷新显示
+                renderOrderList();
+                renderPaymentList();
+                
+                // 关闭弹窗
+                closeQRModal();
+                
+                // 显示结果
+                let msg = '✅ 导入成功！\n';
+                if (importCount > 0) msg += `新增 ${importCount} 个订单\n`;
+                if (mergeCount > 0) msg += `更新 ${mergeCount} 个订单\n`;
+                msg += `\n当前共 ${existingOrders.length} 个订单`;
+                alert(msg);
+                
+            } catch (e) {
+                console.error('导入失败:', e);
+                alert('订单码无效或已损坏，请检查是否复制完整。\n\n错误：' + e.message);
+            }
+        }
+        
         // ==================== 收款汇总 ====================
         function renderPaymentList() {
             const orders = Storage.get('orders') || [];
@@ -2271,23 +2533,24 @@
             try {
                 // 显示二维码和团购码
                 qrcodeDiv.innerHTML = `
-                    <div style="text-align: center; padding: 20px;">
-                        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 16px; border-radius: 12px; margin-bottom: 20px;">
-                            <p style="font-size: 16px; font-weight: 600; margin: 0;">📱 扫码即可下单</p>
-                        </div>
-                        <div id="qrCanvas" style="margin-bottom: 20px; display: inline-block; padding: 16px; background: white; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.1);"></div>
-                        <p style="font-size: 13px; color: #666; margin-bottom: 15px;">将二维码分享到群里<br>邻居扫码即可下单</p>
-                        <div style="background: #f5f5f5; padding: 16px; border-radius: 12px; margin-top: 15px;">
-                            <p style="font-size: 12px; color: #999; margin-bottom: 10px;">如果无法扫码，可使用团购码：</p>
-                            <button onclick="showGroupCodeModal('${groupCode}')" style="padding: 10px 24px; font-size: 14px; background: linear-gradient(135deg, #07c160 0%, #06ad56 100%); color: white; border: none; border-radius: 20px; cursor: pointer; font-weight: 500; box-shadow: 0 2px 8px rgba(7, 193, 96, 0.3);">查看团购码</button>
+                    <div style="text-align: center; padding: 24px 32px;">
+                        <div id="qrCanvas" style="margin: 0 auto 20px; padding: 20px; background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.12); display: inline-block;"></div>
+                        <p style="font-size: 14px; color: #666; margin-bottom: 20px;">将二维码分享到群里，邻居扫码即可下单</p>
+                        
+                        <div style="background: #f5f5f5; padding: 18px 24px; border-radius: 12px; margin-top: 15px;">
+                            <p style="font-size: 12px; color: #999; margin-bottom: 12px;">其他分享方式：</p>
+                            <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                                <button onclick="copyShopLink('${shopUrl}')" style="padding: 10px 20px; font-size: 14px; background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%); color: white; border: none; border-radius: 20px; cursor: pointer; font-weight: 500; box-shadow: 0 2px 8px rgba(24, 144, 255, 0.3);">🔗 复制链接</button>
+                                <button onclick="showGroupCodeModal('${groupCode}')" style="padding: 10px 20px; font-size: 14px; background: linear-gradient(135deg, #07c160 0%, #06ad56 100%); color: white; border: none; border-radius: 20px; cursor: pointer; font-weight: 500; box-shadow: 0 2px 8px rgba(7, 193, 96, 0.3);">📋 团购码</button>
+                            </div>
                         </div>
                     </div>
                 `;
                 
                 new QRCode(document.getElementById('qrCanvas'), {
                     text: shopUrl,
-                    width: 240,
-                    height: 240,
+                    width: 280,
+                    height: 280,
                     colorDark: '#000000',
                     colorLight: '#ffffff',
                     correctLevel: QRCode.CorrectLevel.L
@@ -2305,44 +2568,47 @@
             const qrcodeDiv = document.getElementById('qrcode');
             
             const reasonText = urlLength ? `链接较长（${urlLength}字符），二维码无法扫描` : '商品较多';
+            const shopUrl = window.location.href.split('?')[0] + '?d=' + groupCode;
             
             qrcodeDiv.innerHTML = `
-                <div style="padding: 24px; text-align: center; max-width: 480px; margin: 0 auto;">
-                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 16px; margin-bottom: 20px;">
-                        <p style="font-size: 18px; font-weight: 600; margin-bottom: 8px;">📱 请使用团购码分享</p>
-                        <p style="font-size: 13px; opacity: 0.9;">${reasonText}，建议使用团购码方式分享</p>
+                <div style="padding: 28px; text-align: center;">
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 24px; border-radius: 16px; margin-bottom: 24px;">
+                        <p style="font-size: 20px; font-weight: 600; margin: 0 0 8px 0;">📱 请使用团购码分享</p>
+                        <p style="font-size: 14px; opacity: 0.9; margin: 0;">${reasonText}，建议使用团购码方式分享</p>
                     </div>
                     
-                    <div style="background: #f0f9ff; border: 2px solid #1890ff; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
-                        <p style="font-size: 14px; color: #333; margin-bottom: 12px; font-weight: 600;">📋 团购码（点击复制后发微信群）：</p>
-                        <textarea id="groupCodeText" style="width: 100%; height: 120px; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 11px; font-family: monospace; resize: none; background: white;" readonly>${groupCode}</textarea>
-                        <button onclick="copyGroupCodeFull('${groupCode}')" style="margin-top: 15px; padding: 14px 40px; background: linear-gradient(135deg, #07c160 0%, #06ad56 100%); color: white; border: none; border-radius: 25px; cursor: pointer; font-size: 16px; font-weight: 600; box-shadow: 0 4px 12px rgba(7, 193, 96, 0.3);">📋 一键复制团购码</button>
-                        <p style="font-size: 12px; color: #999; margin-top: 10px;">复制后请直接粘贴到微信群</p>
+                    <div style="background: #f0f9ff; border: 2px solid #1890ff; border-radius: 14px; padding: 24px; margin-bottom: 24px;">
+                        <p style="font-size: 15px; color: #333; margin-bottom: 16px; font-weight: 600;">📋 团购码（点击复制后发微信群）：</p>
+                        <textarea id="groupCodeText" style="width: 100%; height: 140px; padding: 14px; border: 1px solid #ddd; border-radius: 10px; font-size: 12px; font-family: monospace; resize: none; background: white;" readonly>${groupCode}</textarea>
+                        <button onclick="copyGroupCodeFull('${groupCode}')" style="margin-top: 18px; padding: 16px 48px; background: linear-gradient(135deg, #07c160 0%, #06ad56 100%); color: white; border: none; border-radius: 28px; cursor: pointer; font-size: 17px; font-weight: 600; box-shadow: 0 4px 16px rgba(7, 193, 96, 0.35);">📋 一键复制团购码</button>
+                        <p style="font-size: 13px; color: #999; margin-top: 12px;">复制后请直接粘贴到微信群</p>
                     </div>
                     
-                    <div style="background: #fff7e6; border: 1px solid #ffd591; border-radius: 12px; padding: 16px; text-align: left;">
-                        <p style="font-size: 14px; color: #333; margin-bottom: 12px; font-weight: 600;">📝 邻居使用步骤：</p>
-                        <div style="display: flex; flex-direction: column; gap: 8px;">
-                            <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #666;">
-                                <span style="width: 24px; height: 24px; background: #1890ff; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0;">1</span>
+                    <div style="background: #fff7e6; border: 1px solid #ffd591; border-radius: 14px; padding: 20px; text-align: left;">
+                        <p style="font-size: 15px; color: #333; margin-bottom: 16px; font-weight: 600;">📝 邻居使用步骤：</p>
+                        <div style="display: flex; flex-direction: column; gap: 10px;">
+                            <div style="display: flex; align-items: center; gap: 12px; font-size: 14px; color: #555;">
+                                <span style="width: 28px; height: 28px; background: #1890ff; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; font-weight: 600;">1</span>
                                 <span>团长将团购码复制后发微信群</span>
                             </div>
-                            <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #666;">
-                                <span style="width: 24px; height: 24px; background: #1890ff; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0;">2</span>
+                            <div style="display: flex; align-items: center; gap: 12px; font-size: 14px; color: #555;">
+                                <span style="width: 28px; height: 28px; background: #1890ff; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; font-weight: 600;">2</span>
                                 <span>邻居点击下方链接打开下单页面</span>
                             </div>
-                            <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #666;">
-                                <span style="width: 24px; height: 24px; background: #1890ff; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0;">3</span>
+                            <div style="display: flex; align-items: center; gap: 12px; font-size: 14px; color: #555;">
+                                <span style="width: 28px; height: 28px; background: #1890ff; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; font-weight: 600;">3</span>
                                 <span>输入团购码，点击"加载商品"</span>
                             </div>
-                            <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #666;">
-                                <span style="width: 24px; height: 24px; background: #52c41a; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0;">✓</span>
+                            <div style="display: flex; align-items: center; gap: 12px; font-size: 14px; color: #555;">
+                                <span style="width: 28px; height: 28px; background: #52c41a; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; font-weight: 600;">✓</span>
                                 <span>即可看到商品并下单</span>
                             </div>
                         </div>
-                        <div style="margin-top: 15px; padding: 12px; background: white; border-radius: 8px; border: 1px solid #ffd591;">
-                            <p style="font-size: 12px; color: #666; margin: 0 0 5px 0;">下单链接：</p>
-                            <p style="font-size: 11px; color: #1890ff; word-break: break-all; margin: 0; font-family: monospace;">${window.location.href.split('?')[0]}</p>
+                        
+                        <div style="margin-top: 20px; padding: 16px; background: white; border-radius: 12px; border: 1px solid #ffd591;">
+                            <p style="font-size: 13px; color: #666; margin: 0 0 10px 0; font-weight: 500;">下单链接（可直接复制分享给邻居）：</p>
+                            <p style="font-size: 12px; color: #1890ff; word-break: break-all; margin: 0 0 12px 0; font-family: monospace; background: #f5f5f5; padding: 10px; border-radius: 6px;">${shopUrl}</p>
+                            <button onclick="copyShopLink('${shopUrl.replace(/'/g, "\\'")}')" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500;">🔗 复制完整下单链接</button>
                         </div>
                     </div>
                 </div>
@@ -2426,6 +2692,43 @@
         
         function closeQRModal() {
             document.getElementById('qrModal').classList.remove('active');
+        }
+        
+        // 复制下单链接
+        function copyShopLink(url) {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(url).then(() => {
+                    showToast('✅ 下单链接已复制，请粘贴到微信群');
+                }).catch(err => {
+                    console.error('复制失败:', err);
+                    fallbackCopyLink(url);
+                });
+            } else {
+                fallbackCopyLink(url);
+            }
+        }
+        
+        // 降级复制方案
+        function fallbackCopyLink(url) {
+            const textarea = document.createElement('textarea');
+            textarea.value = url;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            
+            try {
+                if (document.execCommand('copy')) {
+                    showToast('✅ 下单链接已复制，请粘贴到微信群');
+                } else {
+                    showToast('复制失败，请长按手动复制链接');
+                }
+            } catch (err) {
+                console.error('复制失败:', err);
+                showToast('复制失败，请长按手动复制链接');
+            }
+            
+            document.body.removeChild(textarea);
         }
         
         function downloadQRCode() {
@@ -2577,27 +2880,44 @@
             if (products.length === 0) {
                 // 没有商品时显示输入团购码界面
                 container.innerHTML = `
-                    <div class="empty-state" style="padding: 30px;">
-                        <div class="empty-icon">📦</div>
-                        <p style="margin-bottom: 15px; font-size: 16px; color: #333;">🛒 欢迎使用团购下单</p>
-                        <div style="background: #fff7e6; border: 1px solid #ffd591; border-radius: 8px; padding: 12px; margin-bottom: 20px; max-width: 300px; margin-left: auto; margin-right: auto;">
-                            <p style="font-size: 13px; color: #666; margin: 0; line-height: 1.6;">
-                                <b>使用步骤：</b><br>
-                                1. 向团长索取团购码<br>
-                                2. 长按下方输入框粘贴<br>
-                                3. 点击"加载商品"
-                            </p>
-                        </div>
-                        <div style="max-width: 300px; margin: 0 auto;">
-                            <textarea id="groupCodeInput" class="form-input" placeholder="请长按此处粘贴团购码..." style="text-align: left; margin-bottom: 10px; height: 80px; font-size: 12px; font-family: monospace;"></textarea>
-                            <div style="display: flex; gap: 10px;">
-                                <button class="btn btn-secondary" onclick="pasteGroupCode()" style="flex: 1;">📋 粘贴</button>
-                                <button class="btn btn-primary" onclick="loadByGroupCode()" style="flex: 2;">加载商品</button>
+                    <div class="empty-state" style="padding: 40px 24px; text-align: center;">
+                        <div style="width: 100px; height: 100px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; font-size: 48px;">📱</div>
+                        <h3 style="margin-bottom: 12px; font-size: 20px; color: #333; font-weight: 600;">欢迎使用团购下单</h3>
+                        <p style="margin-bottom: 24px; font-size: 14px; color: #666;">首次使用需要输入团购码加载商品</p>
+                        
+                        <div style="background: linear-gradient(135deg, #fff7e6 0%, #fff0d6 100%); border: 2px solid #ffd591; border-radius: 12px; padding: 20px; margin-bottom: 24px; max-width: 360px; margin-left: auto; margin-right: auto; text-align: left;">
+                            <p style="font-size: 15px; color: #333; margin: 0 0 12px 0; font-weight: 600;">📋 使用步骤：</p>
+                            <div style="display: flex; flex-direction: column; gap: 10px;">
+                                <div style="display: flex; align-items: center; gap: 10px; font-size: 14px; color: #555;">
+                                    <span style="width: 26px; height: 26px; background: #1890ff; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; font-weight: 600;">1</span>
+                                    <span>向团长索取团购码</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 10px; font-size: 14px; color: #555;">
+                                    <span style="width: 26px; height: 26px; background: #1890ff; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; font-weight: 600;">2</span>
+                                    <span>点击下方输入框粘贴</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 10px; font-size: 14px; color: #555;">
+                                    <span style="width: 26px; height: 26px; background: #52c41a; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; font-weight: 600;">✓</span>
+                                    <span>点击"加载商品"即可下单</span>
+                                </div>
                             </div>
                         </div>
-                        <p style="margin-top: 15px; font-size: 12px; color: #999;">
-                            💡 提示：团购码是一串很长的字符，请完整复制粘贴
-                        </p>
+                        
+                        <div style="max-width: 360px; margin: 0 auto; background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.08);">
+                            <label style="display: block; text-align: left; font-size: 14px; color: #333; margin-bottom: 8px; font-weight: 500;">团购码：</label>
+                            <textarea id="groupCodeInput" class="form-input" placeholder="请在此粘贴团购码..." style="text-align: left; margin-bottom: 16px; height: 100px; font-size: 13px; font-family: monospace; padding: 12px; border: 2px solid #e0e0e0; border-radius: 10px; background: #fafafa;"></textarea>
+                            <div style="display: flex; gap: 12px;">
+                                <button class="btn btn-secondary" onclick="pasteGroupCode()" style="flex: 1; padding: 14px; font-size: 15px; border-radius: 10px; font-weight: 500;">📋 粘贴</button>
+                                <button class="btn btn-primary" onclick="loadByGroupCode()" style="flex: 2; padding: 14px; font-size: 15px; border-radius: 10px; font-weight: 600;">🚀 加载商品</button>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 24px; padding: 16px; background: #f0f9ff; border-radius: 10px; max-width: 360px; margin-left: auto; margin-right: auto;">
+                            <p style="font-size: 13px; color: #1890ff; margin: 0; line-height: 1.5;">
+                                💡 <b>温馨提示：</b><br>
+                                团购码是一串很长的字符，请完整复制粘贴，不要遗漏任何字符
+                            </p>
+                        </div>
                     </div>
                 `;
             } else {
@@ -2811,19 +3131,50 @@
                 const compact = JSON.parse(decodedStr);
                 console.log('JSON解析成功:', compact);
                 
+                // 验证数据格式
+                if (!compact || typeof compact !== 'object') {
+                    throw new Error('数据格式错误');
+                }
+                
                 // 解码数据
                 const shopName = compact.n || '小区团购';
-                const products = (compact.p || []).map(item => ({
-                    id: item[0],
-                    name: item[1],
-                    specs: item[2].map(s => ({
-                        name: s[0],
-                        price: s[1],
-                        stock: s[2] !== null && s[2] !== undefined ? s[2] : undefined
-                    }))
-                }));
+                
+                // 验证商品数据
+                if (!compact.p || !Array.isArray(compact.p)) {
+                    throw new Error('商品数据格式错误');
+                }
+                
+                const products = compact.p.map((item, idx) => {
+                    if (!Array.isArray(item) || item.length < 3) {
+                        console.error(`商品${idx}格式错误:`, item);
+                        throw new Error(`第${idx+1}个商品数据格式错误`);
+                    }
+                    if (!Array.isArray(item[2])) {
+                        console.error(`商品${idx}规格格式错误:`, item[2]);
+                        throw new Error(`第${idx+1}个商品规格数据错误`);
+                    }
+                    return {
+                        id: item[0],
+                        name: item[1],
+                        specs: item[2].map((s, sidx) => {
+                            if (!Array.isArray(s) || s.length < 2) {
+                                console.error(`  规格${sidx}格式错误:`, s);
+                                throw new Error(`第${idx+1}个商品的第${sidx+1}个规格数据错误`);
+                            }
+                            return {
+                                name: s[0],
+                                price: s[1],
+                                stock: s[2] !== null && s[2] !== undefined ? s[2] : undefined
+                            };
+                        })
+                    };
+                });
                 
                 console.log('解码后的商品数量:', products.length);
+                
+                if (products.length === 0) {
+                    throw new Error('没有找到任何商品');
+                }
                 
                 // 保存到本地存储
                 Storage.set('products', products);
@@ -2836,16 +3187,17 @@
                     });
                 }
                 
-                showToast('商品加载成功！');
+                showToast(`✅ 成功加载 ${products.length} 个商品！`);
                 
-                // 重新初始化页面
+                // 重新初始化页面显示商品
                 setTimeout(() => {
                     initShopPage();
-                }, 500);
+                }, 800);
                 
             } catch (e) {
                 console.error('团购码解码失败:', e);
-                alert('团购码无效或已损坏，请重新复制。错误: ' + e.message);
+                console.error('错误详情:', e.message);
+                alert('团购码无效或已损坏，请检查是否复制完整。\n\n错误信息: ' + e.message + '\n\n提示：\n1. 团购码区分大小写\n2. 请确保完整复制，不要遗漏任何字符\n3. 如果问题持续，请让团长重新生成团购码');
             }
         }
         
@@ -2884,6 +3236,48 @@
             if (checkDeadline()) {
                 showToast('下单已截止');
                 return;
+            }
+            
+            // 检查库存（基于当前设备存储的库存，仅供参考）
+            const products = Storage.get('products') || [];
+            const orders = Storage.get('orders') || [];
+            
+            for (const item of items) {
+                const product = products.find(p => p.id === item.productId);
+                if (!product) continue;
+                
+                const spec = product.specs.find(s => s.name === item.specName);
+                if (!spec || spec.stock === undefined) continue;
+                
+                // 计算已售数量（当前设备上）
+                let soldInThisDevice = 0;
+                orders.forEach(order => {
+                    // 如果是修改订单，要减去原订单的数量
+                    if (order.nickname === nickname) return;
+                    
+                    order.items.forEach(i => {
+                        if (i.productName === item.productName && i.specName === item.specName) {
+                            soldInThisDevice += i.quantity;
+                        }
+                    });
+                });
+                
+                // 计算原订单该商品数量（如果是修改）
+                const existingOrder = orders.find(o => o.nickname === nickname);
+                let originalQty = 0;
+                if (existingOrder) {
+                    const originalItem = existingOrder.items.find(i => 
+                        i.productName === item.productName && i.specName === item.specName
+                    );
+                    if (originalItem) originalQty = originalItem.quantity;
+                }
+                
+                // 检查库存：已售 + 新购 - 原购 <= 库存
+                const availableStock = spec.stock - soldInThisDevice + originalQty;
+                if (item.quantity > availableStock) {
+                    alert(`⚠️ 库存不足！\n\n商品：${item.productName}（${item.specName}）\n库存：${spec.stock}件\n已售（本设备）：${soldInThisDevice}件\n\n可购买数量：${availableStock}件\n您选择了：${item.quantity}件\n\n提示：如果其他设备也有订单，实际库存可能更少。建议团长在管理后台确认总销量。`);
+                    return;
+                }
             }
             
             // 检查是否已存在该用户的订单，如果存在则询问是否修改
